@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode.h"
 
 
+// TODO(hidsteno): put a report thingy in here?
+
 /* report id */
 #define REPORT_ID_KEYBOARD  1
 #define REPORT_ID_MOUSE     2
@@ -105,6 +107,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if defined(PROTOCOL_VUSB)
   #undef KEYBOARD_SHARED_EP
   #undef MOUSE_SHARED_EP
+#endif
+
+#ifdef HIDSTENO_ENABLE
+#define STENO_REPORT_SIZE 6
 #endif
 
 #ifdef __cplusplus

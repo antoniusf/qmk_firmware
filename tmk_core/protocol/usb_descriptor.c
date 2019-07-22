@@ -247,6 +247,26 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM RawReport[] =
 };
 #endif
 
+#ifdef HIDSTENO_ENABLE
+const USB_Descriptor_HIDReport_Datatype_t PROGMEM StenoReport[] =
+{
+    HID_RI_USAGE_PAGE(16, 0xFF02), /* Vendor Page 0xFF02 */
+    HID_RI_USAGE(8, 0x61), /* Vendor Usage 0x01 */
+    HID_RI_COLLECTION(8, 0x01), /* Application */
+	HID_RI_USAGE_MINIMUM(8, 8), /* Vendor Usages 8 to 45 */
+	HID_RI_USAGE_MAXIMUM(8, 45),
+        HID_RI_LOGICAL_MINIMUM(8, 0),
+        HID_RI_LOGICAL_MAXIMUM(8, 1),
+        HID_RI_REPORT_SIZE(8, 1),
+        HID_RI_REPORT_COUNT(8, 38),
+        HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+	HID_RI_REPORT_SIZE(8, 2),
+	HID_RI_REPORT_COUNT(8, 1),
+	HID_RI_INPUT(8, HID_IOF_CONSTANT),
+    HID_RI_END_COLLECTION(0),
+};
+#endif
+
 #ifdef CONSOLE_ENABLE
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM ConsoleReport[] =
 {
@@ -501,6 +521,48 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 	            .EndpointAddress        = (ENDPOINT_DIR_OUT | RAW_OUT_EPNUM),
 	            .Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
 	            .EndpointSize           = RAW_EPSIZE,
+	            .PollingIntervalMS      = 0x01
+	        },
+	#endif
+
+	    /*
+	     * Steno
+	     */
+	#ifdef HIDSTENO_ENABLE
+	    .Steno_Interface =
+	        {
+	            .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
+
+	            .InterfaceNumber        = STENO_INTERFACE,
+	            .AlternateSetting       = 0x00,
+
+	            .TotalEndpoints         = 1,
+
+	            .Class                  = HID_CSCP_HIDClass,
+	            .SubClass               = HID_CSCP_NonBootSubclass,
+	            .Protocol               = HID_CSCP_NonBootProtocol,
+
+	            .InterfaceStrIndex      = NO_DESCRIPTOR
+	        },
+
+	    .Steno_HID =
+	        {
+	            .Header                 = {.Size = sizeof(USB_HID_Descriptor_HID_t), .Type = HID_DTYPE_HID},
+
+	            .HIDSpec                = VERSION_BCD(1,1,1),
+	            .CountryCode            = 0x00,
+	            .TotalReportDescriptors = 1,
+	            .HIDReportType          = HID_DTYPE_Report,
+	            .HIDReportLength        = sizeof(StenoReport)
+	        },
+
+	    .Steno_INEndpoint =
+	        {
+	            .Header                 = {.Size = sizeof(USB_Descriptor_Endpoint_t), .Type = DTYPE_Endpoint},
+
+	            .EndpointAddress        = (ENDPOINT_DIR_IN | STENO_IN_EPNUM),
+	            .Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+	            .EndpointSize           = STENO_EPSIZE,
 	            .PollingIntervalMS      = 0x01
 	        },
 	#endif
@@ -947,6 +1009,12 @@ uint16_t get_usb_descriptor(const uint16_t wValue,
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
                 break;
 #endif
+#ifdef HIDSTENO_ENABLE
+	    case STENO_INTERFACE:
+	        Address = &ConfigurationDescriptor.Steno_HID;
+		Size    = sizeof(USB_HID_Descriptor_HID_t);
+		break;
+#endif
 #ifdef CONSOLE_ENABLE
             case CONSOLE_INTERFACE:
                 Address = &ConfigurationDescriptor.Console_HID;
@@ -980,6 +1048,12 @@ uint16_t get_usb_descriptor(const uint16_t wValue,
                 Address = &RawReport;
                 Size    = sizeof(RawReport);
                 break;
+#endif
+#ifdef HIDSTENO_ENABLE
+	    case STENO_INTERFACE:
+	        Address = &StenoReport;
+		Size    = sizeof(StenoReport);
+		break;
 #endif
 #ifdef CONSOLE_ENABLE
             case CONSOLE_INTERFACE:

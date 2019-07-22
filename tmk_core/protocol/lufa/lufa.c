@@ -91,6 +91,10 @@
 	#include "raw_hid.h"
 #endif
 
+#ifdef HIDSTENO_ENABLE
+// TODO: do we need an include here, like for raw hid?? (probably not)
+#endif
+
 uint8_t keyboard_idle = 0;
 /* 0: Boot Protocol, 1: Report Protocol(default) */
 uint8_t keyboard_protocol = 1;
@@ -224,6 +228,58 @@ static void raw_hid_task(void)
 			raw_hid_receive( data, sizeof(data) );
 		}
 	}
+}
+#endif
+
+#ifdef HIDSTENO_ENABLE
+/** \brief Raw HID Send
+ *
+ * FIXME: Needs doc
+ */
+void hidsteno_send( uint8_t data[6] )
+{
+    // TODO: this is from rawhid_send. do we need this??
+    if (USB_DeviceState != DEVICE_STATE_Configured)
+    {
+	    return;
+    }
+
+    /* Select the HID Steno Report Endpoint */
+    uint8_t timeout = 255;
+    uint8_t ep = STENO_IN_EPNUM;
+    uint8_t size = STENO_REPORT_SIZE;
+
+    Endpoint_SelectEndpoint(ep);
+
+    /* Check if write ready for a polling interval around 10ms */
+    while (timeout-- && !Endpoint_IsReadWriteAllowed()) _delay_us(40);
+    if (!Endpoint_IsReadWriteAllowed()) return;
+
+    Endpoint_Write_Stream_LE(data, size, NULL);
+
+    /* Finalize the stream transfer to send the last packet */
+    Endpoint_ClearIN();
+
+
+    /* This is the other stuff from raw_hid_send. do we need this??
+     * 
+     * // TODO: decide if we allow calls to raw_hid_send() in the middle
+     * // of other endpoint usage.
+     * uint8_t ep = Endpoint_GetCurrentEndpoint();
+     * 
+     * Endpoint_SelectEndpoint(STENO_IN_EPNUM);
+     * 
+     * // Check to see if the host is ready to accept another packet
+     * if (Endpoint_IsINReady())
+     * {
+     * 	// Write data
+     * 	Endpoint_Write_Stream_LE(data, RAW_EPSIZE, NULL);
+     * 	// Finalize the stream transfer to send the last packet
+     * 	Endpoint_ClearIN();
+     * }
+     * 
+     * Endpoint_SelectEndpoint(ep);
+     */
 }
 #endif
 
@@ -432,6 +488,11 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 									 RAW_EPSIZE, ENDPOINT_BANK_SINGLE);
     ConfigSuccess &= ENDPOINT_CONFIG(RAW_OUT_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_OUT,
 									 RAW_EPSIZE, ENDPOINT_BANK_SINGLE);
+#endif
+
+#ifdef HIDSTENO_ENABLE
+    ConfigSuccess &= ENDPOINT_CONFIG(STENO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
+                                     STENO_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
 #ifdef CONSOLE_ENABLE
