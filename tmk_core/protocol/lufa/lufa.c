@@ -232,7 +232,7 @@ static void raw_hid_task(void)
 #endif
 
 #ifdef HIDSTENO_ENABLE
-/** \brief Raw HID Send
+/** \brief Steno HID Send
  *
  * FIXME: Needs doc
  */

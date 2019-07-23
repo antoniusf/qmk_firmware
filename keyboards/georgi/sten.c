@@ -38,6 +38,10 @@ uint16_t repTimer 		= 0;
 bool	inMouse 		= false;
 int8_t	mousePress;
 
+
+// XXX TODO ugly hack, forward decl here until we clear up the structure
+void hidsteno_send( uint8_t data[6] );
+
 // All processing done at chordUp goes through here
 bool send_steno_chord_user(steno_mode_t mode, uint8_t chord[6]) { 
 	// Check for mousekeys, this is release
@@ -137,6 +141,12 @@ out:
 
 // Update Chord State 
 bool process_steno_user(uint16_t keycode, keyrecord_t *record) { 
+
+	uint8_t data[6] = {0, 0, 255, 0, 0, 0};
+	hidsteno_send(data);
+
+	// uprintf("doin a chords guys!!!\n");
+
 	// Everything happens in here when steno keys come in.
 	// Bail on keyup
 	if (!record->event.pressed) return true;
