@@ -81,7 +81,7 @@ typedef struct
     USB_Descriptor_Endpoint_t             Raw_OUTEndpoint;
 #endif
 
-#if defined(HIDSTENO_ENABLE)
+#if defined(STENOHID_ENABLE)
     // Raw HID Interface
     USB_Descriptor_Interface_t            Steno_Interface;
     USB_HID_Descriptor_HID_t              Steno_HID;
@@ -146,7 +146,7 @@ enum usb_interfaces {
 #if defined(RAW_ENABLE)
     RAW_INTERFACE,
 #endif
-#if defined(HIDSTENO_ENABLE)
+#if defined(STENOHID_ENABLE)
     STENO_INTERFACE,
 #endif
 #if defined(MOUSE_ENABLE) && !defined(MOUSE_SHARED_EP)
@@ -187,7 +187,7 @@ enum usb_endpoints {
     RAW_IN_EPNUM = NEXT_EPNUM,
     RAW_OUT_EPNUM = NEXT_EPNUM,
 #endif
-#if defined(HIDSTENO_ENABLE)
+#if defined(STENOHID_ENABLE)
     STENO_IN_EPNUM = NEXT_EPNUM,
 #endif
 #if defined(SHARED_EP_ENABLE)

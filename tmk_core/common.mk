@@ -118,8 +118,8 @@ ifeq ($(strip $(RAW_ENABLE)), yes)
     TMK_COMMON_DEFS += -DRAW_ENABLE
 endif
 
-ifeq ($(strip $(HIDSTENO_ENABLE)), yes)
-    TMK_COMMON_DEFS += -DHIDSTENO_ENABLE
+ifeq ($(strip $(STENOHID_ENABLE)), yes)
+    TMK_COMMON_DEFS += -DSTENOHID_ENABLE
 endif
 
 ifeq ($(strip $(CONSOLE_ENABLE)), yes)

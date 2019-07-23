@@ -247,7 +247,7 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM RawReport[] =
 };
 #endif
 
-#ifdef HIDSTENO_ENABLE
+#ifdef STENOHID_ENABLE
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM StenoReport[] =
 {
     HID_RI_USAGE_PAGE(16, 0xFF02), /* Vendor Page 0xFF02 */
@@ -528,7 +528,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 	    /*
 	     * Steno
 	     */
-	#ifdef HIDSTENO_ENABLE
+	#ifdef STENOHID_ENABLE
 	    .Steno_Interface =
 	        {
 	            .Header                 = {.Size = sizeof(USB_Descriptor_Interface_t), .Type = DTYPE_Interface},
@@ -1009,7 +1009,7 @@ uint16_t get_usb_descriptor(const uint16_t wValue,
                 Size    = sizeof(USB_HID_Descriptor_HID_t);
                 break;
 #endif
-#ifdef HIDSTENO_ENABLE
+#ifdef STENOHID_ENABLE
 	    case STENO_INTERFACE:
 	        Address = &ConfigurationDescriptor.Steno_HID;
 		Size    = sizeof(USB_HID_Descriptor_HID_t);
@@ -1049,7 +1049,7 @@ uint16_t get_usb_descriptor(const uint16_t wValue,
                 Size    = sizeof(RawReport);
                 break;
 #endif
-#ifdef HIDSTENO_ENABLE
+#ifdef STENOHID_ENABLE
 	    case STENO_INTERFACE:
 	        Address = &StenoReport;
 		Size    = sizeof(StenoReport);

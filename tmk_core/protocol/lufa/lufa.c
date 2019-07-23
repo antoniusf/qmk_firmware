@@ -91,7 +91,7 @@
 	#include "raw_hid.h"
 #endif
 
-#ifdef HIDSTENO_ENABLE
+#ifdef STENOHID_ENABLE
 // TODO: do we need an include here, like for raw hid?? (probably not)
 #endif
 
@@ -231,12 +231,12 @@ static void raw_hid_task(void)
 }
 #endif
 
-#ifdef HIDSTENO_ENABLE
+#ifdef STENOHID_ENABLE
 /** \brief Steno HID Send
  *
  * FIXME: Needs doc
  */
-void hidsteno_send( uint8_t data[6] )
+void stenohid_send( uint8_t data[6] )
 {
     // TODO: this is from rawhid_send. do we need this??
     if (USB_DeviceState != DEVICE_STATE_Configured)
@@ -490,7 +490,7 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 									 RAW_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
 
-#ifdef HIDSTENO_ENABLE
+#ifdef STENOHID_ENABLE
     ConfigSuccess &= ENDPOINT_CONFIG(STENO_IN_EPNUM, EP_TYPE_INTERRUPT, ENDPOINT_DIR_IN,
                                      STENO_EPSIZE, ENDPOINT_BANK_SINGLE);
 #endif
