@@ -45,6 +45,7 @@ void stenohid_send( uint8_t data[6] );
 // All processing done at chordUp goes through here
 bool send_steno_chord_user(steno_mode_t mode, uint8_t chord[6]) { 
 	// Check for mousekeys, this is release
+  print("hi were in send_steno_user");
 #ifdef MOUSEKEY_ENABLE
 	if (inMouse) {
 		inMouse = false;
@@ -142,10 +143,10 @@ out:
 // Update Chord State 
 bool process_steno_user(uint16_t keycode, keyrecord_t *record) { 
 
-	uint8_t data[6] = {0, 0, 255, 0, 0, 0};
-	stenohid_send(data);
+        uint8_t data[6] = {0, 0, 255, 0, 0, 0};
+        stenohid_send(data);
 
-	// uprintf("doin a chords guys!!!\n");
+	uprintf("doin a chords guys!!!\n");
 
 	// Everything happens in here when steno keys come in.
 	// Bail on keyup

@@ -11,10 +11,10 @@ CUSTOM_MATRIX			 = yes
 #Firmware reduction options
 MOUSEKEY_ENABLE			 = yes 		# 1500 bytes
 NO_TAPPING				 = no 	    # 2000 bytes
-NO_PRINT				 = yes		
+NO_PRINT				 = no
 
 #Debug options
-CONSOLE_ENABLE			 = no
+CONSOLE_ENABLE			 = yes
 DEBUG_MATRIX_SCAN_RATE   = no
 DEBUG_MATRIX			 = no
 ONLY_QWERTY				 = no

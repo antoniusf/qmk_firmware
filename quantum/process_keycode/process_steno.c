@@ -17,8 +17,15 @@
 #include "quantum_keycodes.h"
 #include "eeprom.h"
 #include "keymap_steno.h"
-#include "virtser.h"
 #include <string.h>
+
+#ifdef VIRTSER_ENABLE
+#include "virtser.h"
+#endif
+
+#ifdef STENOHID_ENABLE
+#include "stenohid.h"
+#endif
 
 // TxBolt Codes
 #define TXB_NUL 0
@@ -77,6 +84,7 @@ static void steno_clear_state(void) {
   memset(chord, 0, sizeof(chord));
 }
 
+#ifdef VIRTSER_ENABLE
 static void send_steno_state(uint8_t size, bool send_empty) {
   for (uint8_t i = 0; i < size; ++i) {
     if (chord[i] || send_empty) {
@@ -84,11 +92,13 @@ static void send_steno_state(uint8_t size, bool send_empty) {
     }
   }
 }
+#endif
 
 void steno_init() {
   if (!eeconfig_is_enabled()) {
     eeconfig_init();
   }
+  // TODO: handle disabled mode
   mode = eeprom_read_byte(EECONFIG_STENOMODE);
 }
 
@@ -111,8 +121,10 @@ __attribute__ ((weak))
 bool process_steno_user(uint16_t keycode, keyrecord_t *record) { return true; }
 
 static void send_steno_chord(void) {
+  print("hi were in send_steno_chord\n");
   if (send_steno_chord_user(mode, chord)) {
     switch(mode) {
+#ifdef VIRTSER_ENABLE
       case STENO_MODE_BOLT:
         send_steno_state(BOLT_STATE_SIZE, false);
         virtser_send(0); // terminating byte
@@ -121,6 +133,12 @@ static void send_steno_chord(void) {
         chord[0] |= 0x80; // Indicate start of packet
         send_steno_state(GEMINI_STATE_SIZE, true);
         break;
+#endif
+#ifdef STENOHID_ENABLE
+      case STENO_MODE_HID:
+	stenohid_send(chord);
+	break;
+#endif
     }
   }
   steno_clear_state();
@@ -134,6 +152,7 @@ uint8_t *steno_get_chord(void) {
   return &chord[0];
 }
 
+#ifdef VIRTSER_ENABLE
 static bool update_state_bolt(uint8_t key, bool press) {
   uint8_t boltcode = pgm_read_byte(boltmap + key);
   if (press) {
@@ -156,9 +175,28 @@ static bool update_state_gemini(uint8_t key, bool press) {
   }
   return false;
 }
+#endif
+
+#ifdef STENOHID_ENABLE
+static bool update_state_hid(uint8_t key, bool press) {
+  // we're going to reuse the gemini layout for now,
+  // to save memory (but we're going to arrange the bits
+  // in a way that makes more sense for our case)
+  int idx = key / 8;
+  uint8_t bit = 1 << (key % 8);
+  if (press) {
+    state[idx] |= bit;
+    chord[idx] |= bit;
+  } else {
+    state[idx] &= ~bit;
+  }
+  return false;
+}
+#endif
 
 bool process_steno(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
+#ifdef VIRTSER_ENABLE
     case QK_STENO_BOLT:
       if (!process_steno_user(keycode, record)) {
         return false;
@@ -176,21 +214,37 @@ bool process_steno(uint16_t keycode, keyrecord_t *record) {
         steno_set_mode(STENO_MODE_GEMINI);
       }
       return false;
+#endif
+      
+    // TODO: add case switch for STENO_HID (depends on adding QK_STENO_HID)
 
     case STN__MIN...STN__MAX:
+      print("hi were in process_steno\n");
       if (!process_steno_user(keycode, record)) {
         return false;
       }
+      uprintf("steno mode: %d\n", mode);
       switch(mode) {
+#ifdef VIRTSER_ENABLE
         case STENO_MODE_BOLT:
           update_state_bolt(keycode - QK_STENO, IS_PRESSED(record->event));
           break;
         case STENO_MODE_GEMINI:
           update_state_gemini(keycode - QK_STENO, IS_PRESSED(record->event));
           break;
+#endif
+#ifdef STENOHID_ENABLE
+        case STENO_MODE_HID:
+	  print("hi were in steno_mode_hid\n");
+	  update_state_hid(keycode - QK_STENO, IS_PRESSED(record->event));
+	  break;
+#endif
       }
+      print("before postprocessing\n");
       // allow postprocessing hooks
       if (postprocess_steno_user(keycode, record, mode, chord, pressed)) {
+	uprintf("inside of postprocessing, pressed=%d\n", pressed);
+	uprintf("state: %d %d %d %d %d %d\n", state[0], state[1], state[2], state[3], state[4], 0xFF);
         if (IS_PRESSED(record->event)) {
           ++pressed;
         } else {
