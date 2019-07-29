@@ -251,9 +251,9 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM RawReport[] =
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM StenoReport[] =
 {
     HID_RI_USAGE_PAGE(16, 0xFF02), /* Vendor Page 0xFF02 */
-    HID_RI_USAGE(8, 0x61), /* Vendor Usage 0x01 */
+    HID_RI_USAGE(8, 0x01), /* Vendor Usage 0x01 */
     HID_RI_COLLECTION(8, 0x01), /* Application */
-	HID_RI_USAGE_MINIMUM(8, 8), /* Vendor Usages 8 to 45 */
+	HID_RI_USAGE_MINIMUM(8, 8), /* Vendor Usages 8 to 49 */
 	HID_RI_USAGE_MAXIMUM(8, 49),
         HID_RI_LOGICAL_MINIMUM(8, 0),
         HID_RI_LOGICAL_MAXIMUM(8, 1),

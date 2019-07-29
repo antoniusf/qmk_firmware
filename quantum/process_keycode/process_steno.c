@@ -137,6 +137,10 @@ static void send_steno_chord(void) {
 #ifdef STENOHID_ENABLE
       case STENO_MODE_HID:
 	stenohid_send(chord);
+
+	// send the empty chord, to show that all keys are up again
+	steno_clear_state();
+	stenohid_send(chord);
 	break;
 #endif
     }

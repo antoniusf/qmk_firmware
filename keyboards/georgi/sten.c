@@ -143,8 +143,8 @@ out:
 // Update Chord State 
 bool process_steno_user(uint16_t keycode, keyrecord_t *record) { 
 
-        uint8_t data[6] = {0, 0, 255, 0, 0, 0};
-        stenohid_send(data);
+  // uint8_t data[6] = {0, 0, 255, 0, 0, 0};
+  // stenohid_send(data);
 
 	uprintf("doin a chords guys!!!\n");
 
