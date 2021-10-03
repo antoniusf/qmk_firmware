@@ -559,6 +559,49 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor = {
     },
 #endif
 
+#ifdef STENOHID_ENABLE
+    /*
+     * StenoHID
+     */
+    .Steno_Interface = {
+        .Header = {
+            .Size               = sizeof(USB_Descriptor_Interface_t),
+            .Type               = DTYPE_Interface
+        },
+
+        .InterfaceNumber        = STENO_INTERFACE,
+        .AlternateSetting       = 0x00,
+        .TotalEndpoints         = 1,
+        .Class                  = HID_CSCP_HIDClass,
+        .SubClass               = HID_CSCP_NonBootSubclass,
+        .Protocol               = HID_CSCP_NonBootProtocol,
+        .InterfaceStrIndex      = NO_DESCRIPTOR
+    },
+    .Steno_HID = {
+        .Header = {
+            .Size               = sizeof(USB_HID_Descriptor_HID_t),
+            .Type               = HID_DTYPE_HID
+        },
+
+        .HIDSpec                = VERSION_BCD(1, 1, 1),
+        .CountryCode            = 0x00,
+        .TotalReportDescriptors = 1,
+        .HIDReportType          = HID_DTYPE_Report,
+        .HIDReportLength        = sizeof(StenoReport)
+    },
+    .Steno_INEndpoint = {
+        .Header = {
+            .Size               = sizeof(USB_Descriptor_Endpoint_t),
+            .Type               = DTYPE_Endpoint
+        },
+
+        .EndpointAddress        = (ENDPOINT_DIR_IN | STENO_IN_EPNUM),
+        .Attributes             = (EP_TYPE_INTERRUPT | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
+        .EndpointSize           = STENO_EPSIZE,
+        .PollingIntervalMS      = 0x01
+    },
+#endif
+
 #if defined(MOUSE_ENABLE) && !defined(MOUSE_SHARED_EP)
     /*
      * Mouse
@@ -1153,6 +1196,14 @@ uint16_t get_usb_descriptor(const uint16_t wValue, const uint16_t wIndex, const 
                     break;
 #endif
 
+#ifdef STENOHID_ENABLE
+                case STENO_INTERFACE:
+                    Address = &ConfigurationDescriptor.Steno_HID;
+                    Size    = sizeof(USB_HID_Descriptor_HID_t);
+
+                    break;
+#endif
+
 #ifdef CONSOLE_ENABLE
                 case CONSOLE_INTERFACE:
                     Address = &ConfigurationDescriptor.Console_HID;
@@ -1206,6 +1257,14 @@ uint16_t get_usb_descriptor(const uint16_t wValue, const uint16_t wIndex, const 
                 case RAW_INTERFACE:
                     Address = &RawReport;
                     Size    = sizeof(RawReport);
+
+                    break;
+#endif
+
+#ifdef STENOHID_ENABLE
+                case STENO_INTERFACE:
+                    Address = &StenoReport;
+                    Size    = sizeof(StenoReport);
 
                     break;
 #endif
