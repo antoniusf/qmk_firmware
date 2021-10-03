@@ -247,6 +247,35 @@ static void raw_hid_task(void) {
 }
 #endif
 
+#ifdef STENOHID_ENABLE
+
+/** \brief StenoHID Send
+ *
+ * FIXME: Needs doc
+ */
+void stenohid_send(uint8_t data[6]) {
+
+    // TODO: this is copied from raw_hid_send. do we need this?
+    if (USB_DeviceState != DEVICE_STATE_Configured) {
+        return;
+    }
+
+    /* Select the StenoHID report endpoint */
+    Endpoint_SelectEndpoint(STENOHID_IN_EPNUM);
+
+    /* Check if write ready for a polling interval around 10ms */
+    uint8_t timeout = 255;
+    while (timeout-- && !Endpoint_IsReadWriteAllowed()) _delay_us(40);
+    if (!Endpoint_IsReadWriteAllowed()) return;
+
+    /* Write report data */
+    Endpoint_Write_Stream_LE(data, STENO_REPORT_SIZE, NULL);
+
+    /* Finalize the stream transfer to send the last packet */
+    Endpoint_ClearIN();
+}
+#endif
+
 /*******************************************************************************
  * Console
  ******************************************************************************/
@@ -496,6 +525,11 @@ void EVENT_USB_Device_ConfigurationChanged(void) {
     /* Setup raw HID endpoints */
     ConfigSuccess &= Endpoint_ConfigureEndpoint((RAW_IN_EPNUM | ENDPOINT_DIR_IN), EP_TYPE_INTERRUPT, RAW_EPSIZE, 1);
     ConfigSuccess &= Endpoint_ConfigureEndpoint((RAW_OUT_EPNUM | ENDPOINT_DIR_OUT), EP_TYPE_INTERRUPT, RAW_EPSIZE, 1);
+#endif
+
+#ifdef STENOHID_ENABLE
+    /* Setup stenoHID endpoint */
+    ConfigSuccess &= EndpointConfigureEndpoint((RAW_IN_EPNUM | ENDPOINT_DIR_IN), EP_TYPE_INTERRUPT, STENOHID_EPSIZE, 1);
 #endif
 
 #ifdef CONSOLE_ENABLE

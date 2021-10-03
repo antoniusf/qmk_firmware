@@ -303,6 +303,25 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM RawReport[] = {
 };
 #endif
 
+#ifdef STENOHID_ENABLE
+const USB_Descriptor_HIDReport_Datatype_t PROGMEM StenoReport[] {
+    HID_RI_USAGE_PAGE(16, 0xFF02), /* Vendor Page 0xFF02 */
+    HID_RI_USAGE(8, 0x01), /* Vendor Usage 0x01 */
+    HID_RI_COLLECTION(8, 0x01), /* Application */
+        HID_RI_USAGE_MINIMUM(8, 8), /* Vendor Usages 8 to 49 */
+        HID_RI_USAGE_MAXIMUM(8, 49),
+        HID_RI_LOGICAL_MINIMUM(8, 0),
+        HID_RI_LOGICAL_MAXIMUM(8, 1),
+        HID_RI_REPORT_SIZE(8, 1),
+        HID_RI_REPORT_COUNT(8, 42),
+        HID_RI_INPUT(8, HID_IOF_DATA | HID_IOF_VARIABLE | HID_IOF_ABSOLUTE),
+        HID_RI_REPORT_SIZE(8, 6),
+        HID_RI_REPORT_COUNT(8, 1),
+        HID_RI_INPUT(8, HID_IOF_CONSTANT),
+    HID_RI_END_COLLECTION(0),
+}
+#endif
+
 #ifdef CONSOLE_ENABLE
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM ConsoleReport[] = {
     HID_RI_USAGE_PAGE(16, 0xFF31), // Vendor Defined (PJRC Teensy compatible)

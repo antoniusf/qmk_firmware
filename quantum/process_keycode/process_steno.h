@@ -18,7 +18,15 @@
 
 #include "quantum.h"
 
-typedef enum { STENO_MODE_BOLT, STENO_MODE_GEMINI } steno_mode_t;
+typedef enum {
+#ifdef VIRTSER_ENABLE
+    STENO_MODE_BOLT,
+    STENO_MODE_GEMINI,
+#endif
+#ifdef STENOHID_ENABLE
+    STENO_MODE_HID
+#endif
+} steno_mode_t;
 
 bool     process_steno(uint16_t keycode, keyrecord_t *record);
 void     steno_init(void);

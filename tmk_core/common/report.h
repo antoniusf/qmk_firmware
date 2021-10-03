@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include "keycode.h"
 
+// TODO(stenohid): put a report thingy in here?
+
 // clang-format off
 
 /* HID report IDs */
